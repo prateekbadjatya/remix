@@ -1,0 +1,17 @@
+[
+    {
+        "id": 1,
+        "title": "my first post",
+        "url": "/singlePost"
+    },
+    {
+        "id": 2,
+        "title": "my second post",
+        "url": "/singlePost"
+    },
+    {
+        "id": 3,
+        "title": "my third post",
+        "url": "/singlePost"
+    }
+]
