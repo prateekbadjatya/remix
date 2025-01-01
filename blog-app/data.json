@@ -43,5 +43,14 @@
     "createdAt": "2023-01-25T12:15:00Z",
     "content": "JavaScript frameworks have become increasingly popular in recent years, making it easier to build complex web applications. In this post, we'll explore some of the most popular JavaScript frameworks, such as React, Angular, and Vue.js, and discuss their strengths and use cases.",
     "slug": "javascript-frameworks"
+  },
+  {
+    "id": 6,
+    "userId": 1,
+    "title": "Hello World",
+    "author": "John Doe",
+    "content": "This is some content",
+    "createdAt": "2024-05-23 20:01:24.161+06:30",
+    "slug": "hello-world"
   }
 ]

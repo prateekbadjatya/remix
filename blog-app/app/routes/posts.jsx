@@ -11,8 +11,15 @@ export const meta = () => {
   ];
 };
 
-
 export async function loader() {
+  console.log(
+    "----------------------------------------------------------------"
+  );
+  console.log("loader called");
+  console.log(
+    "----------------------------------------------------------------"
+  );
+
   return posts;
 }
 

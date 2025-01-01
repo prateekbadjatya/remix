@@ -1,34 +1,145 @@
-import React from "react";
-import { Link, NavLink, useLoaderData, useMatches, useNavigate } from "@remix-run/react";
+import React, { useState, useEffect } from "react";
+import {
+  useLoaderData,
+  useMatches,
+  json,
+  useActionData,
+  useNavigation,
+} from "@remix-run/react";
+
 // import posts from "../../data.json";
 import PostsList from "../components/PostsList";
+import Comments from "../components/Comments";
+import commentsData from "../../commentsData.json";
+import fs from "fs";
+import { fakeDelay } from "../utils/helpers";
+
+
+
+// export async function loader({ params }) {
+//   const slug = params.slug;
+//   // const data = posts.find((item) => item.slug === slug);
+//   // return data ?? {};
+//   return slug;
+// }
 
 export async function loader({ params }) {
   const slug = params.slug;
-  // const data = posts.find((item) => item.slug === slug);
-  // return data ?? {};
-  return slug;
+
+  const currentPostComments = commentsData.filter(
+    (item) => item.postSlug == slug
+  );
+  return json({ slug: slug, postComments: currentPostComments });
 }
 
+//------------actions------------------------------------
+
+/*
+Here updated comment will be fetched because of loader component automatically
+
+*/
+export async function action({ request }) {
+  await fakeDelay(5000);
+  const body = await request.formData();
+  const commentBody = body.get("commentBody");
+  const postId = body.get("postId");
+  const postSlug = body.get("postSlug");
+
+  const errors = {};
+
+  if (!commentBody || commentBody == null || commentBody == "") {
+    errors.commentBody = "Comment should not be empty";
+  }
+  if (Object.keys(errors).length > 0) {
+    return json({ errors });
+  }
+
+  const newComment = {
+    id: Date.now(),
+    userId: 1,
+    postId: parseInt(postId),
+    postSlug: postSlug,
+    body: commentBody,
+    createdAt: new Date(),
+  };
+  const newComments = [...commentsData, newComment];
+  try {
+    // Get the absolute path to the data.json file
+    const commentsFilePath =
+      "C:\\Users\\PRATEEK\\Downloads\\remix\\blog-app\\commentsData.json";
+    // Write the updated data back to the file
+    fs.writeFileSync(commentsFilePath, JSON.stringify(newComments, null, 2));
+    return json({ success: true });
+  } catch (error) {
+    console.log("error", error);
+    return json({ success: false });
+  }
+}
+
+//-----------------------------------------------
+
 const SinglePost = () => {
-  const slug = useLoaderData();
+  //   const slug = useLoaderData();
+  const { slug, postComments } = useLoaderData();
+  const actionData = useActionData();
+  console.log("🚀 ~ SinglePost ~ postComments:", postComments);
 
   const matches = useMatches();
 
-  console.log('matches', matches)
+  console.log("matches", matches);
   const posts = matches[1].data.find((item) => item.slug === slug);
 
+  //----------------------------------------------------------------
+  //as soon as the user submits the comment, we will show it in
+  // the UI and then in the background we will validate it with the server.
+  /*
+  You can validate the final server response and if all okay, then you do not do anything or change some metadata. Maybe. But if it is an error, you can always remove the comment from the UI.
+ */
+  const navigation = useNavigation();
+  const [comments, setComments] = useState(postComments);
 
+  useEffect(() => {
+    // Navigation  form data will hold all the data that is being submitted via the form,
+    console.log("navigation.formData ", navigation.formData);
+    if (navigation.formData && navigation.formData.get("commentBody")) {
+      console.log("HIIIII 99");
+      const newComment = {
+        id: Date.now(),
+        userId: 1,
+        postId: parseInt(navigation.formData.get("postId")),
+        postSlug: navigation.formData.get("postSlug"),
+        body: navigation.formData.get("commentBody"),
+        createdAt: new Date(),
+      };
+      const updatedData = [...comments, newComment];
+      console.log("🚀 ~ useEffect ~ updatedData:", updatedData);
+      setComments(updatedData);
+    }
+  }, [navigation.formData]);
+
+  useEffect(() => {
+    // remove above that we are shwoing before api success on error remove this
+    if (actionData && !actionData.success) {
+      setComments(postComments);
+    }
+  }, [actionData]);
+
+  //----------------------------------------------------------------
   if (Object.keys(posts).length) {
-    return <PostsList posts={[posts]} />;
+    return (
+      <>
+        <PostsList posts={[posts]} />
+        <br />
+        <br />
+
+        <Comments comments={comments} actionData={actionData} />
+      </>
+    );
   }
   return <h1>No data found for given id</h1>;
 };
 
 export default SinglePost;
-
-
-
 
 /*
 
