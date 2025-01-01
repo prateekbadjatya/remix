@@ -1,101 +1,101 @@
 //-------------handle Multiple form submission-------------------------------------------
-import {
-  Form,
-  json,
-  useFetcher,
-  useLoaderData,
-  useNavigation,
-} from "@remix-run/react";
-import { fakeDelay } from "../utils/helpers";
+// import {
+//   Form,
+//   json,
+//   useFetcher,
+//   useLoaderData,
+//   useNavigation,
+// } from "@remix-run/react";
+// import { fakeDelay } from "../utils/helpers";
 
-let fruits = [];
+// let fruits = [];
 
-export async function loader({ params, request }) {
-  // console.log("🚀 ~ loader ~ request:", request)
-  // example: http://localhost:5173/demo?key=121
-  const url = new URL(request.url);
-  const queryParam = url.searchParams.get("key");
-  console.log("🚀 ~ loader ~ queryParam:", queryParam);
+// export async function loader({ params, request }) {
+//   // console.log("🚀 ~ loader ~ request:", request)
+//   // example: http://localhost:5173/demo?key=121
+//   const url = new URL(request.url);
+//   const queryParam = url.searchParams.get("key");
+//   console.log("🚀 ~ loader ~ queryParam:", queryParam);
 
-  await fakeDelay(2000);
-  return fruits;
-}
+//   await fakeDelay(2000);
+//   return fruits;
+// }
 
-export async function action({ request }) {
-  const body = await request.formData();
-  // name value in form
-  const _action = body.get("_action");
+// export async function action({ request }) {
+//   const body = await request.formData();
+//   // name value in form
+//   const _action = body.get("_action");
 
-  if (_action == "create") {
-    const addFruit = body.get("addFruit");
-    fruits = [...fruits, addFruit];
-  } else if (_action == "delete") {
-    await fakeDelay(3000);
-    const fruitNameToDelete = body.get("fruitName");
-    const index = fruits.findIndex((fruit) => fruit === fruitNameToDelete);
-    if (index !== -1) {
-      fruits.splice(index, 1);
-    }
-  }
+//   if (_action == "create") {
+//     const addFruit = body.get("addFruit");
+//     fruits = [...fruits, addFruit];
+//   } else if (_action == "delete") {
+//     await fakeDelay(3000);
+//     const fruitNameToDelete = body.get("fruitName");
+//     const index = fruits.findIndex((fruit) => fruit === fruitNameToDelete);
+//     if (index !== -1) {
+//       fruits.splice(index, 1);
+//     }
+//   }
 
-  return json({ success: true });
-}
+//   return json({ success: true });
+// }
 
-export default function Demo() {
-  const fruits = useLoaderData();
-  return (
-    <>
-      <section>
-        <ul>
-          {fruits.map((item, index) => (
-            <FruitsList item={item} index={index} />
-          ))}
-        </ul>
-      </section>
-      <section>
-        <Form method="POST">
-          <input type="text" name="addFruit" placeholder="Add a fruit" />
-          <button type="submit" name="_action" value="create">
-            Add
-          </button>
-        </Form>
-      </section>
-    </>
-  );
-}
+// export default function Demo() {
+//   const fruits = useLoaderData();
+//   return (
+//     <>
+//       <section>
+//         <ul>
+//           {fruits.map((item, index) => (
+//             <FruitsList item={item} index={index} />
+//           ))}
+//         </ul>
+//       </section>
+//       <section>
+//         <Form method="POST">
+//           <input type="text" name="addFruit" placeholder="Add a fruit" />
+//           <button type="submit" name="_action" value="create">
+//             Add
+//           </button>
+//         </Form>
+//       </section>
+//     </>
+//   );
+// }
 
-export function FruitsList({ item, index }) {
-  const navigation = useNavigation();
-  const fetcher = useFetcher();
-  // I have use fetcher form here becuase becuase when use click delete button of all the list then previous request got cancelled
-  // and only last request will considerd in the remix form
-  // this is the reason i used fethcer form here
-  return (
-    <li
-      key={index}
-      style={{
-        opacity: fetcher?.formData?.get("fruitName") == item ? 0.25 : 1,
-        background:
-          fetcher?.formData?.get("fruitName") == item ? "red" : "white",
-      }}
-    >
-      <div className="grid">
-        <p>{item}</p>
-        <fetcher.Form method="POST">
-          <input type="hidden" name="fruitName" value={item} />
-          <button
-            type="submit"
-            name="_action"
-            value="delete"
-            style={{ width: "50px" }}
-          >
-            X
-          </button>
-        </fetcher.Form>
-      </div>
-    </li>
-  );
-}
+// export function FruitsList({ item, index }) {
+//   const navigation = useNavigation();
+//   const fetcher = useFetcher();
+//   // I have use fetcher form here becuase becuase when use click delete button of all the list then previous request got cancelled
+//   // and only last request will considerd in the remix form
+//   // this is the reason i used fethcer form here
+//   return (
+//     <li
+//       key={index}
+//       style={{
+//         opacity: fetcher?.formData?.get("fruitName") == item ? 0.25 : 1,
+//         background:
+//           fetcher?.formData?.get("fruitName") == item ? "red" : "white",
+//       }}
+//     >
+//       <div className="grid">
+//         <p>{item}</p>
+//         <fetcher.Form method="POST">
+//           <input type="hidden" name="fruitName" value={item} />
+//           <button
+//             type="submit"
+//             name="_action"
+//             value="delete"
+//             style={{ width: "50px" }}
+//           >
+//             X
+//           </button>
+//         </fetcher.Form>
+//       </div>
+//     </li>
+//   );
+// }
 
 //--------------------------------------------------------
 
@@ -187,9 +187,18 @@ export function FruitsList({ item, index }) {
 // }
 //-----------------------------------------------------------------
 
-/*
+
 
 //----------------useSubmit Hook Example---------------------
+
+// the action function in Remix is called when you use the useSubmit hook to programmatically submit data. This is because useSubmit replicates the behavior of a traditional form submission by sending data to the specified action route on the server.
+
+// Explanation
+// When you call the submit function from useSubmit:
+
+// It submits the provided data to the specified action route (or the current route if no action is specified).
+// Remix routes the request to the corresponding action function for that route.
+// The action function processes the data, just like it would for a standard form submission.
 
 // import { json } from "@remix-run/node";
 // import fs from "fs/promises";
@@ -254,4 +263,4 @@ export default function Demo() {
 
 
 
-*/
+
