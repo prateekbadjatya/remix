@@ -10,7 +10,7 @@ export default function Index() {
     <>
       <i className="fa fa-car"></i>
       <i className="fa fa-car" style={{ fontSize: "48px", color: "red" }}></i>
-      <h1>Home Page</h1>
+      <h1>Home Page _index</h1>
     </>
   );
 }
